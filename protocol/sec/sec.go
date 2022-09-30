@@ -266,6 +266,10 @@ func NewSEC(t core.Transport) *SEC {
 		sec.Emit("close")
 	}).On("error", func(err error) {
 		sec.Emit("error", err)
+	}).On("auth-error", func(result uint32) {
+		sec.Emit("auth-error", result)
+	}).On("auth-success", func() {
+		sec.Emit("auth-success")
 	})
 	return sec
 }

@@ -225,6 +225,10 @@ func NewMCS(t core.Transport, recvOpCode MCSDomainPDU, sendOpCode MCSDomainPDU) 
 		m.Emit("close")
 	}).On("error", func(err error) {
 		m.Emit("error", err)
+	}).On("auth-error", func(result uint32) {
+		m.Emit("auth-error", result)
+	}).On("auth-success", func() {
+		m.Emit("auth-success")
 	})
 	return m
 }
