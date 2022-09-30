@@ -96,6 +96,10 @@ func NewPDULayer(t core.Transport) *PDULayer {
 		p.Emit("close")
 	}).On("error", func(err error) {
 		p.Emit("error", err)
+	}).On("auth-error", func(result uint32) {
+		p.Emit("auth-error", result)
+	}).On("auth-success", func() {
+		p.Emit("auth-success")
 	})
 	return p
 }

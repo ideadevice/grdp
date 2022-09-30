@@ -8,10 +8,10 @@ import (
 
 	"github.com/ideadevice/grdp/glog"
 
-	"github.com/lunixbochs/struc"
 	"github.com/ideadevice/grdp/core"
 	"github.com/ideadevice/grdp/emission"
 	"github.com/ideadevice/grdp/protocol/tpkt"
+	"github.com/lunixbochs/struc"
 )
 
 // take idea from https://github.com/Madnikulin50/gordp
@@ -219,6 +219,7 @@ func (x *X224) recvConnectionConfirm(s []byte) {
 		if message.ProtocolNeg.Result == 2 {
 			glog.Info("Only use Standard RDP Security mechanisms, Reconnect with Standard RDP")
 		}
+		x.Emit("auth-error", message.ProtocolNeg.Result)
 		x.Close()
 		return
 	}
@@ -229,6 +230,7 @@ func (x *X224) recvConnectionConfirm(s []byte) {
 	}
 
 	if x.selectedProtocol == PROTOCOL_HYBRID_EX {
+		x.Emit("auth-error", 16)
 		glog.Error("NODE_RDP_PROTOCOL_HYBRID_EX_NOT_SUPPORTED")
 		return
 	}
@@ -237,6 +239,7 @@ func (x *X224) recvConnectionConfirm(s []byte) {
 
 	if x.selectedProtocol == PROTOCOL_RDP {
 		glog.Info("*** RDP security selected ***")
+		x.Emit("auth-success")
 		x.Emit("connect", x.selectedProtocol)
 		return
 	}
@@ -248,6 +251,7 @@ func (x *X224) recvConnectionConfirm(s []byte) {
 			glog.Error("start tls failed:", err)
 			return
 		}
+		x.Emit("auth-success")
 		x.Emit("connect", x.selectedProtocol)
 		return
 	}
@@ -259,6 +263,7 @@ func (x *X224) recvConnectionConfirm(s []byte) {
 			glog.Error("start NLA failed:", err)
 			return
 		}
+		x.Emit("auth-success")
 		x.Emit("connect", x.selectedProtocol)
 		return
 	}
